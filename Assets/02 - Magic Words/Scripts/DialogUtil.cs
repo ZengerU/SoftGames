@@ -14,12 +14,17 @@ namespace MagicWords
         {
             try
             {
-                var client = new HttpClient();
-                var response = await client.GetAsync(url);
+                var request = UnityWebRequest.Get(url);
+                await request.SendWebRequest();
 
-                response.EnsureSuccessStatusCode();
-                var responseBody = await response.Content.ReadAsStringAsync();
-                var data = JsonConvert.DeserializeObject<DialogData>(responseBody);
+                if (request.result != UnityWebRequest.Result.Success)
+                {
+                    throw new HttpRequestException(request.error);
+                }
+
+                var response = request.downloadHandler.text;
+                
+                var data = JsonConvert.DeserializeObject<DialogData>(response);
 
                 await LoadImages(data.Avatars.Concat<Image>(data.Emojis));
                 TrimEmojis(data);
@@ -71,10 +76,7 @@ namespace MagicWords
         static async Task<Texture2D> LoadTextureFromUrl(string url)
         {
             using var request = UnityWebRequestTexture.GetTexture(url);
-            var operation = request.SendWebRequest();
-
-            while (!operation.isDone)
-                await Task.Yield();
+            await request.SendWebRequest();
 
             if (request.result != UnityWebRequest.Result.Success)
             {
