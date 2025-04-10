@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Threading.Tasks;
 using UnityEngine;
 
-namespace _02___Magic_Words
+namespace MagicWords
 {
     public class DialogManager : MonoBehaviour
     {
@@ -15,11 +14,15 @@ namespace _02___Magic_Words
 
         int _currentDialogIndex = 0;
 
-        async void Awake()
+        void Awake()
         {
             _emojis = new ImageCollection<Emoji>();
             _avatars = new ImageCollection<Avatar>();
+            _ = SetupDialog();
+        }
 
+        async Task SetupDialog()
+        {
             _dialog = await DialogUtil.GetDialog(dataUrl);
 
             _emojis.AddRange(_dialog.Emojis);
@@ -29,24 +32,11 @@ namespace _02___Magic_Words
             DisplayDialog();
         }
 
-        internal void DisplayDialog()
+        public void DisplayDialog()
         {
             dialogView.DisplayDialog(_dialog.Dialogue[_currentDialogIndex]);
             _currentDialogIndex++;
             _currentDialogIndex %= _dialog.Dialogue.Count;
-        }
-    }
-
-    internal class ImageCollection<T> : KeyedCollection<string, T> where T : Image
-    {
-        protected override string GetKeyForItem(T img) => img.Name;
-
-        internal void AddRange(List<T> images)
-        {
-            foreach (var img in images)
-            {
-                Add(img);
-            }
         }
     }
 }

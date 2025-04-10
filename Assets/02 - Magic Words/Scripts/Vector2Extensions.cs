@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace _02___Magic_Words
+namespace MagicWords
 {
     public static class Vector2Extensions
     {

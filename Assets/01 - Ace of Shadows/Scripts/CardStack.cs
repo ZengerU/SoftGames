@@ -2,73 +2,76 @@
 using UnityEngine;
 using UnityEngine.Pool;
 
-public class CardStack : MonoBehaviour
+namespace AceOfShadows
 {
-    IObjectPool<SpriteRenderer> _cardPool;
-    [SerializeField] BottomCardFacade bottomCardFacade;
-    [SerializeField] uint startingAmount = 144;
-
-    SpriteRenderer _topCard;
-    internal uint CardAmount;
-
-    internal Vector3 TopCardPosition
+    public class CardStack : MonoBehaviour
     {
-        get
+        IObjectPool<SpriteRenderer> _cardPool;
+        [SerializeField] BottomCardFacade bottomCardFacade;
+        [SerializeField] uint startingAmount = 144;
+
+        SpriteRenderer _topCard;
+        internal uint CardAmount;
+
+        internal Vector3 TopCardPosition
         {
-            var result = transform.position;
-            result.y += bottomCardFacade.transform.localScale.y;
+            get
+            {
+                var result = transform.position;
+                result.y += bottomCardFacade.transform.localScale.y;
+                return result;
+            }
+        }
+
+        public void InjectPool(IObjectPool<SpriteRenderer> cardPool)
+        {
+            _cardPool = cardPool;
+        }
+
+        void Awake()
+        {
+            CardAmount = startingAmount;
+        }
+
+        void Start()
+        {
+            bottomCardFacade.RenderAmount(CardAmount);
+            if (startingAmount > 1)
+                CreateNewTopCard();
+        }
+
+        void CreateNewTopCard()
+        {
+            _topCard = _cardPool.Get();
+            _topCard.transform.parent = transform;
+            _topCard.transform.position = TopCardPosition;
+        }
+
+        internal SpriteRenderer PopCard()
+        {
+            if (_topCard == null)
+                throw new NullReferenceException("There's no card to pop");
+
+            var result = _topCard;
+            result.sortingOrder = (int)(startingAmount - CardAmount + 1);
+
+            CardAmount--;
+
+            CreateNewTopCard();
+
+            bottomCardFacade.RenderAmount(CardAmount - 1);
+
             return result;
         }
-    }
 
-    public void InjectPool(IObjectPool<SpriteRenderer> cardPool)
-    {
-        _cardPool = cardPool;
-    }
+        internal void PushCard(SpriteRenderer card)
+        {
+            if (_topCard != null)
+                _cardPool.Release(_topCard);
 
-    void Awake()
-    {
-        CardAmount = startingAmount;
-    }
-
-    void Start()
-    {
-        bottomCardFacade.RenderAmount(CardAmount);
-        if (startingAmount > 1)
-            CreateNewTopCard();
-    }
-
-    void CreateNewTopCard()
-    {
-        _topCard = _cardPool.Get();
-        _topCard.transform.parent = transform;
-        _topCard.transform.position = TopCardPosition;
-    }
-
-    internal SpriteRenderer PopCard()
-    {
-        if (_topCard == null)
-            throw new NullReferenceException("There's no card to pop");
-
-        var result = _topCard;
-        result.sortingOrder = (int)(startingAmount - CardAmount);
-
-        CardAmount--;
-
-        CreateNewTopCard();
-
-        bottomCardFacade.RenderAmount(CardAmount - 1);
-
-        return result;
-    }
-
-    internal void PushCard(SpriteRenderer card)
-    {
-        if (_topCard != null)
-            _cardPool.Release(_topCard);
-
-        _topCard = card;
-        CardAmount++;
-        bottomCardFacade.RenderAmount(CardAmount - 1);
+            _topCard = card;
+            CardAmount++;
+            bottomCardFacade.RenderAmount(CardAmount - 1);
+        }
     }
 }

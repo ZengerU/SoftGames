@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using UnityEngine;
 
-namespace _02___Magic_Words
+namespace MagicWords
 {
     [Serializable]
     public class DialogData
@@ -28,6 +29,8 @@ namespace _02___Magic_Words
 
     public class Emoji : Image
     {
+        public Sprite Sprite;
+        public uint Index;
     }
 
     public class Avatar : Image
@@ -35,7 +38,13 @@ namespace _02___Magic_Words
         public AvatarPosition AvatarPosition { get; set; }
         [JsonProperty("position")] public string Position { get; set; }
 
-        public Avatar()
+        [OnSerialized]
+        internal void SetupPosition(StreamingContext context)
+        {
+            AvatarPosition = Position == "left" ? AvatarPosition.Left : AvatarPosition.Right;
+        }
+        [OnDeserialized]
+        internal void OnDeserializedMethod(StreamingContext context)
         {
             AvatarPosition = Position == "left" ? AvatarPosition.Left : AvatarPosition.Right;
         }

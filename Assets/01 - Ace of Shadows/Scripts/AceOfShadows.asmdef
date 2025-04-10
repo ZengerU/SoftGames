@@ -1,0 +1,16 @@
+{
+    "name": "AceOfShadows",
+    "rootNamespace": "AceOfShadows",
+    "references": [
+        "GUID:6371ad0f6325bd547a1f42d763daef12"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

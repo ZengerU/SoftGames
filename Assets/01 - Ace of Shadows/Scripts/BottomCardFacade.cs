@@ -1,22 +1,25 @@
 ﻿using UnityEngine;
 
-public class BottomCardFacade : MonoBehaviour
+namespace AceOfShadows
 {
-    const float CardHeight = .012f;
-    [SerializeField] MeshRenderer meshRenderer;
-    Material _material;
-    Vector3 _baseScale;
-
-
-    void Awake()
+    public class BottomCardFacade : MonoBehaviour
     {
-        _material = meshRenderer.material;
-        _baseScale = transform.localScale;
-    }
+        const float CardHeight = .012f;
+        [SerializeField] MeshRenderer meshRenderer;
+        Material _material;
+        Vector3 _baseScale;
 
-    public void RenderAmount(uint cardAmount)
-    {
-        _material.mainTextureScale = new Vector2(1, cardAmount);
-        transform.localScale = new Vector3(_baseScale.x, CardHeight * cardAmount, _baseScale.z);
+
+        void Awake()
+        {
+            _material = meshRenderer.material;
+            _baseScale = transform.localScale;
+        }
+
+        public void RenderAmount(uint cardAmount)
+        {
+            _material.mainTextureScale = new Vector2(1, cardAmount);
+            transform.localScale = new Vector3(_baseScale.x, CardHeight * cardAmount, _baseScale.z);
+        }
     }
 }
